@@ -1,0 +1,5 @@
+services:
+  playnow:
+    image: play-now
+    build: 
+      dockerfile: ./Dockerfile
