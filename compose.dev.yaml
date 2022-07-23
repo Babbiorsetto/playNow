@@ -1,6 +1,0 @@
-services:
-  playnow:
-    build:
-      dockerfile: ./Dockerfile.dev
-    volumes:
-      - ./:/usr/src/app
