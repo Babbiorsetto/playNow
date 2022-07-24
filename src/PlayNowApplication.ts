@@ -2,6 +2,7 @@ import { Client, GatewayIntentBits } from "discord.js";
 import fs from "fs/promises";
 import path from "path";
 import { Command } from "./types/Command";
+import {DISCORD_BOT_TOKEN} from "./config";
 
 export class PlayNowApplication {
     private client: Client;
@@ -22,7 +23,7 @@ export class PlayNowApplication {
     async start() {
         await this.commandSetup();
         this.eventSetup();
-        this.client.login(process.env.DISCORD_BOT_TOKEN)
+        this.client.login(DISCORD_BOT_TOKEN)
     }
 
     private async commandSetup() {
