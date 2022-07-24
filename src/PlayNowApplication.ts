@@ -3,11 +3,14 @@ import fs from "fs/promises";
 import path from "path";
 import { Command } from "./types/Command";
 import {DISCORD_BOT_TOKEN} from "./config";
+import {SongList} from "./entities/SongList"
+import {FileSystemSongListBuilder} from "./builders/SongListBuilder"
 
 export class PlayNowApplication {
     private client: Client;
-    public commands: Map<string, Command>;
     public static commandDir = path.join(__dirname, "commands");
+    private commands: Map<string, Command>;
+    private songList: SongList;
 
     constructor() {
         this.client = new Client({
@@ -17,12 +20,17 @@ export class PlayNowApplication {
                 GatewayIntentBits.GuildVoiceStates
             ]
         });
+        this.songList = new SongList(new FileSystemSongListBuilder(path.join(process.cwd(), "songs")));
         this.commands = new Map<string, Command>();
     }
 
     async start() {
         await this.commandSetup();
+        console.log("Done loading commands");
         this.eventSetup();
+        console.log("Done loading events");
+        await this.songList.rebuild();
+        console.log("Done loading songs");
         this.client.login(DISCORD_BOT_TOKEN)
     }
 
@@ -49,7 +57,7 @@ export class PlayNowApplication {
             console.log("Logged out");
         });
 
-        this.client.on("interactionCreate", async (interaction) => {
+        async function handleInteraction (interaction) {
 
             if (!interaction.isChatInputCommand())
                 return;
@@ -60,11 +68,13 @@ export class PlayNowApplication {
                 return;
     
             try {
-                await command.execute(interaction);
+                await command.execute(interaction, {songList: this.songList});
             } catch (error) {
                 console.error(error);
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
             }
-        });
+        }
+
+        this.client.on("interactionCreate", handleInteraction.bind(this));
     }
 }

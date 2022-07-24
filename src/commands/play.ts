@@ -12,9 +12,8 @@ const play: Command = {
         .setRequired(true)
     )
     .setDMPermission(false),
-    execute: async (interaction) => {
+    execute: async (interaction, applicationContext) => {
         const n = interaction.options.getInteger("n");
-        interaction.reply(`Option was ${n}`);
     }
 };
 
