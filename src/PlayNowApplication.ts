@@ -1,16 +1,18 @@
-import { Client, GatewayIntentBits } from "discord.js";
+import { Client, GatewayIntentBits, Snowflake } from "discord.js";
 import fs from "fs/promises";
 import path from "path";
 import { Command } from "./types/Command";
 import {DISCORD_BOT_TOKEN} from "./config";
 import {SongList} from "./entities/SongList"
 import {FileSystemSongListBuilder} from "./builders/SongListBuilder"
+import { AudioPlayer } from "@discordjs/voice";
 
 export class PlayNowApplication {
     private client: Client;
     public static commandDir = path.join(__dirname, "commands");
     private commands: Map<string, Command>;
     private songList: SongList;
+    private audioPlayers: Map<Snowflake, AudioPlayer>;
 
     constructor() {
         this.client = new Client({
@@ -22,6 +24,7 @@ export class PlayNowApplication {
         });
         this.songList = new SongList(new FileSystemSongListBuilder(path.join(process.cwd(), "songs")));
         this.commands = new Map<string, Command>();
+        this.audioPlayers = new Map();
     }
 
     async start() {
@@ -62,13 +65,16 @@ export class PlayNowApplication {
             if (!interaction.isChatInputCommand())
                 return;
     
-            const command = this.commands.get(interaction.commandName);
+            const command: Command = this.commands.get(interaction.commandName);
     
             if (!command)
                 return;
     
             try {
-                await command.execute(interaction, {songList: this.songList});
+                await command.execute(interaction, {
+                    songList: this.songList,
+                    audioPlayers: this.audioPlayers,
+                });
             } catch (error) {
                 console.error(error);
                 await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
