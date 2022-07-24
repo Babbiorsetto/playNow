@@ -3,3 +3,7 @@ services:
     image: play-now
     build: 
       dockerfile: ./Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - d:/Station/Music/jukebox/:/usr/src/app/songs/
