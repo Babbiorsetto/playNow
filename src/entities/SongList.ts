@@ -12,10 +12,10 @@ export class SongList extends EventEmitter {
         this.builder = builder
     }
 
-    getPage(pageNumber: number) {
+    public getPage(pageNumber: number) {
         const start = pageNumber * LIST_ENTRIES_PER_PAGE;
         const end = start + LIST_ENTRIES_PER_PAGE;
-        return this.songs.slice(start, end);
+        return Array.from(this.songs.entries()).slice(start, end);
     }
 
     async rebuild() {
