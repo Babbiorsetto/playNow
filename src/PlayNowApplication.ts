@@ -6,10 +6,12 @@ import {DISCORD_BOT_TOKEN} from "./config";
 import {SongList} from "./entities/SongList"
 import {FileSystemSongListBuilder} from "./builders/SongListBuilder"
 import { AudioPlayer } from "@discordjs/voice";
+import chokidar from "chokidar";
 
 export class PlayNowApplication {
     private client: Client;
     public static commandDir = path.join(__dirname, "commands");
+    public static songsDir = path.join(process.cwd(), "songs");
     private commands: Map<string, Command>;
     private songList: SongList;
     private audioPlayers: Map<Snowflake, AudioPlayer>;
@@ -22,7 +24,7 @@ export class PlayNowApplication {
                 GatewayIntentBits.GuildVoiceStates
             ]
         });
-        this.songList = new SongList(new FileSystemSongListBuilder(path.join(process.cwd(), "songs")));
+        this.songList = new SongList(new FileSystemSongListBuilder(PlayNowApplication.songsDir));
         this.commands = new Map<string, Command>();
         this.audioPlayers = new Map();
     }
@@ -82,5 +84,18 @@ export class PlayNowApplication {
         }
 
         this.client.on("interactionCreate", handleInteraction.bind(this));
+
+        async function onSongsChange(change) {
+            this.songList.rebuild();
+            console.log(`Song directory change detected ${(path.basename(change))}`)
+        }
+        chokidar.watch(PlayNowApplication.songsDir, {
+            awaitWriteFinish: true,
+            usePolling: true,
+            interval: 1000,
+        })
+        .on("add", onSongsChange.bind(this))
+        .on("change", onSongsChange.bind(this))
+        .on("unlink", onSongsChange.bind(this))
     }
 }
