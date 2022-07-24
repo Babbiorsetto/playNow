@@ -29,5 +29,8 @@
 
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "node",
-	"runArgs": ["--env-file",".env"]
+	"runArgs": ["--env-file",".env"],
+	"mounts": [
+		"source=d:/Station/Music/jukebox/,target=/workspaces/playNow/songs/,type=bind,consistency=cached"
+	]
 }
