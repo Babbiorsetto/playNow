@@ -18,7 +18,8 @@ const list: Command = {
             n = 0;
         }
         const songs = applicationContext.songList.getPage(n);
-        const text = songs.map(([num, song]) => `${num} - ${song.name}`).join("\n");
+        let text = songs.map(([num, song]) => `${num} - ${song.name}`).join("\n");
+        text = text || "Nothing to see here";
         interaction.reply(text);
     }
 }
