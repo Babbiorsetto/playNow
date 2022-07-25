@@ -57,6 +57,10 @@ export class PlayNowApplication {
             process.exit(0);
         });
 
+        process.on("SIGTERM", () => {
+            process.exit(0);
+        });
+
         process.on("exit", () => {
             this.client.destroy();
             console.log("Logged out");
