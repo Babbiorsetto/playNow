@@ -6,4 +6,4 @@ services:
     env_file:
       - .env
     volumes:
-      - d:/Station/Music/jukebox/:/usr/src/app/songs/
+      - ${HOST_MUSIC_DIRECTORY}:/usr/src/app/songs/
