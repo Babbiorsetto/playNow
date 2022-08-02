@@ -29,6 +29,9 @@ const play: Command = {
         let audioPlayer = applicationContext.audioPlayers.get(interaction.guildId);
         if (!audioPlayer) {
             audioPlayer = createAudioPlayer();
+        } else {
+            //something like this
+            audioPlayer.removeAllListeners();
         }
         applicationContext.audioPlayers.set(interaction.guildId, audioPlayer);
         
@@ -37,6 +40,7 @@ const play: Command = {
             .catch(() => {
                 applicationContext.audioPlayers.delete(interaction.guildId);
                 audioPlayer.stop();
+                audioPlayer.removeAllListeners();
                 console.log("Stopped idle audio player")
             })
         });
@@ -50,14 +54,6 @@ const play: Command = {
             guildId: interaction.guildId,
             adapterCreator: interaction.guild.voiceAdapterCreator,
         })
-
-        connection.on(VoiceConnectionStatus.Ready, async () => {
-
-        })
-
-        connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
-            
-        });
 
         const song = applicationContext.songList.songs.at(n);
         const audioResource = createAudioResource(
