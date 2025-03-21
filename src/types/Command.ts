@@ -1,5 +1,10 @@
 import { AudioPlayer } from "@discordjs/voice";
-import { ChatInputCommandInteraction, SlashCommandBuilder, Snowflake } from "discord.js"
+import {
+    ChatInputCommandInteraction,
+    SharedSlashCommand,
+    SlashCommandBuilder,
+    Snowflake,
+} from "discord.js";
 import { SongList } from "src/entities/SongList";
 
 export interface ApplicationContext {
@@ -8,6 +13,9 @@ export interface ApplicationContext {
 }
 
 export interface Command {
-    data: SlashCommandBuilder;
-    execute: (interaction: ChatInputCommandInteraction, applicationContext: ApplicationContext)=> Promise<void>;
+    data: SharedSlashCommand;
+    execute: (
+        interaction: ChatInputCommandInteraction,
+        applicationContext: ApplicationContext
+    ) => Promise<void>;
 }
