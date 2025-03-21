@@ -10,6 +10,7 @@ import {
 } from "@discordjs/voice";
 import {
     GuildMember,
+    InteractionContextType,
     SlashCommandBuilder,
     SlashCommandIntegerOption,
 } from "discord.js";
@@ -26,7 +27,7 @@ const play: Command = {
                 .setDescription("song number")
                 .setRequired(true)
         )
-        .setDMPermission(false),
+        .setContexts(InteractionContextType.Guild),
     execute: async (interaction, applicationContext) => {
         const member = interaction.member as GuildMember;
         if (!member.voice || !member.voice.channelId) {

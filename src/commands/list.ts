@@ -1,4 +1,8 @@
-import { SlashCommandBuilder, SlashCommandIntegerOption } from "discord.js";
+import {
+    InteractionContextType,
+    SlashCommandBuilder,
+    SlashCommandIntegerOption,
+} from "discord.js";
 import { Command } from "../types/Command";
 
 const list: Command = {
@@ -11,7 +15,7 @@ const list: Command = {
                 .setDescription("page number")
                 .setRequired(false)
         )
-        .setDMPermission(false),
+        .setContexts(InteractionContextType.Guild),
     execute: async (interaction, applicationContext) => {
         let n = interaction.options.getInteger("n");
         if (n === undefined) {
