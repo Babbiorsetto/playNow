@@ -1,4 +1,4 @@
-import {PlayNowApplication} from "./PlayNowApplication"
+import { PlayNowApplication } from "./PlayNowApplication";
 
 const app = new PlayNowApplication();
 app.start();

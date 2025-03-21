@@ -2,9 +2,9 @@ import { Client, GatewayIntentBits, Snowflake } from "discord.js";
 import fs from "fs/promises";
 import path from "path";
 import { Command } from "./types/Command";
-import {DISCORD_BOT_TOKEN} from "./config";
-import {SongList} from "./entities/SongList"
-import {FileSystemSongListBuilder} from "./builders/SongListBuilder"
+import { DISCORD_BOT_TOKEN } from "./config";
+import { SongList } from "./entities/SongList";
+import { FileSystemSongListBuilder } from "./builders/SongListBuilder";
 import { AudioPlayer } from "@discordjs/voice";
 import chokidar from "chokidar";
 
@@ -21,10 +21,12 @@ export class PlayNowApplication {
             intents: [
                 GatewayIntentBits.Guilds,
                 GatewayIntentBits.GuildMessages,
-                GatewayIntentBits.GuildVoiceStates
-            ]
+                GatewayIntentBits.GuildVoiceStates,
+            ],
         });
-        this.songList = new SongList(new FileSystemSongListBuilder(PlayNowApplication.songsDir));
+        this.songList = new SongList(
+            new FileSystemSongListBuilder(PlayNowApplication.songsDir)
+        );
         this.commands = new Map<string, Command>();
         this.audioPlayers = new Map();
     }
@@ -36,14 +38,16 @@ export class PlayNowApplication {
         console.log("Done loading events");
         await this.songList.rebuild();
         console.log("Done loading songs");
-        this.client.login(DISCORD_BOT_TOKEN)
+        this.client.login(DISCORD_BOT_TOKEN);
     }
 
     private async commandSetup() {
-        const dir = await fs.opendir(PlayNowApplication.commandDir)
+        const dir = await fs.opendir(PlayNowApplication.commandDir);
         for await (const dirent of dir) {
             console.log(`Loading command from ${dirent.name}`);
-            const importedModule = await import(path.join(PlayNowApplication.commandDir, dirent.name))
+            const importedModule = await import(
+                path.join(PlayNowApplication.commandDir, dirent.name)
+            );
             this.commands.set(importedModule.data.name, importedModule);
         }
     }
@@ -66,16 +70,13 @@ export class PlayNowApplication {
             console.log("Logged out");
         });
 
-        async function handleInteraction (interaction) {
+        async function handleInteraction(interaction) {
+            if (!interaction.isChatInputCommand()) return;
 
-            if (!interaction.isChatInputCommand())
-                return;
-    
             const command: Command = this.commands.get(interaction.commandName);
-    
-            if (!command)
-                return;
-    
+
+            if (!command) return;
+
             try {
                 await command.execute(interaction, {
                     songList: this.songList,
@@ -83,7 +84,10 @@ export class PlayNowApplication {
                 });
             } catch (error) {
                 console.error(error);
-                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+                await interaction.reply({
+                    content: "There was an error while executing this command!",
+                    ephemeral: true,
+                });
             }
         }
 
@@ -91,15 +95,18 @@ export class PlayNowApplication {
 
         async function onSongsChange(change) {
             this.songList.rebuild();
-            console.log(`Song directory change detected ${(path.basename(change))}`)
+            console.log(
+                `Song directory change detected ${path.basename(change)}`
+            );
         }
-        chokidar.watch(PlayNowApplication.songsDir, {
-            awaitWriteFinish: true,
-            usePolling: true,
-            interval: 1000,
-        })
-        .on("add", onSongsChange.bind(this))
-        .on("change", onSongsChange.bind(this))
-        .on("unlink", onSongsChange.bind(this))
+        chokidar
+            .watch(PlayNowApplication.songsDir, {
+                awaitWriteFinish: true,
+                usePolling: true,
+                interval: 1000,
+            })
+            .on("add", onSongsChange.bind(this))
+            .on("change", onSongsChange.bind(this))
+            .on("unlink", onSongsChange.bind(this));
     }
 }

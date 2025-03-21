@@ -4,9 +4,9 @@ import { Command } from "../types/Command";
 
 const disconnect: Command = {
     data: new SlashCommandBuilder()
-    .setName("dc")
-    .setDescription("Disconnect me from voice :'(")
-    .setDMPermission(false),
+        .setName("dc")
+        .setDescription("Disconnect me from voice :'(")
+        .setDMPermission(false),
     execute: async (interaction, applicationContext) => {
         const connection = getVoiceConnection(interaction.guildId);
         if (!connection) {
@@ -15,7 +15,7 @@ const disconnect: Command = {
         }
         connection.destroy();
         interaction.reply("buh bye");
-    }
-}
+    },
+};
 
-export = disconnect
+export = disconnect;

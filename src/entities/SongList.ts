@@ -8,8 +8,8 @@ export class SongList extends EventEmitter {
     builder: SongListBuilder;
 
     constructor(builder: SongListBuilder) {
-        super()
-        this.builder = builder
+        super();
+        this.builder = builder;
     }
 
     public getPage(pageNumber: number) {
@@ -19,10 +19,9 @@ export class SongList extends EventEmitter {
     }
 
     async rebuild() {
-        this.songs = await this.builder.build()
-        .then((songNames) => {
+        this.songs = await this.builder.build().then((songNames) => {
             return songNames.map((name) => new Song(name));
-        })
+        });
         this.emit("rebuild");
     }
 }
